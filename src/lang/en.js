@@ -1,0 +1,22 @@
+export default {
+  m1: 'jan',
+  m2: 'feb',
+  m3: 'mar',
+  m4: 'apr',
+  m5: 'may',
+  m6: 'jun',
+  m7: 'jul',
+  m8: 'aug',
+  m9: 'sept',
+  m10: 'oct',
+  m11: 'nov',
+  m12: 'dec',
+  w0: 'Sunday',
+  w1: 'Monday',
+  w2: 'Tuesday',
+  w3: 'Wednesday',
+  w4: 'Thursday',
+  w5: 'Friday',
+  w6: 'Saturday',
+  yesterday: 'Yesterday'
+}
