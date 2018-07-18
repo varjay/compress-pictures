@@ -1,8 +1,12 @@
 import Languages from './lang/index'
 
 function getwhen (timestamp) {
-  var now = new Date().getTime()
+  var dd = new Date()
+  var now = dd.getTime()
+  var todayStart = `${dd.getFullYear()}/${dd.getMonth() + 1}/${dd.getDate()} 00:00:00`
+  todayStart = new Date(todayStart).getTime()
   var diff = now - timestamp
+  console.log(now)
   /*
    * 小于分钟、小于小时、小于一天、小于两天、小于7天
    * 60000    3600000 86400000 172800000 604800000
@@ -11,11 +15,11 @@ function getwhen (timestamp) {
     return 'seconds'
   } else if (diff < 3600000) {
     return 'minutes'
-  } else if (diff < 86400000) {
+  } else if (timestamp >= todayStart) {
     return 'today'
-  } else if (diff < 172800000) {
+  } else if (timestamp > todayStart - 86400000) {
     return 'yesterday'
-  } else if (diff < 604800000) {
+  } else if (timestamp > todayStart - 604800000) {
     return 'week'
   } else {
     return 'full'
@@ -39,39 +43,26 @@ function TimeFormat(format, time, options) {
   var hours = date.getHours()       // 获取当前小时数(0-23)
   var minutes = date.getMinutes()   // 获取当前分钟数(0-59)
   var seconds = date.getSeconds()   // 获取当前秒数(0-59)
-  console.log(year, month, day, week, hours, minutes, seconds)
 
-  var lang = navigator.language.replace(/-/g, '').toLowerCase()
-  var t
+  var localLang = navigator.language.replace(/-/g, '').toLowerCase()
+  var Lang
   var template
   var type = getwhen(timestamp)
-
-  switch (lang) {
-    case 'zhcn': t = Languages.zhcn
-    template = {
-      full: 'yyyy年MM月dd日 HH:mm',
-      week: `${t['w' + week]} HH:mm`,
-      yesterday: `${t['yesterday']} HH:mm`,
-      today: 'HH:mm',
-      minutes: 'HH:mm',
-      seconds: 'HH:mm'
-    }
-    template = template[type]
-    break
-
-    default: t = Languages.en
-    template = {
-      full: `dd ${t['m' + month]} yyyy HH:mm`,
-      week: `${t['w' + week]} HH:mm`,
-      yesterday: `${t['yesterday']} HH:mm`,
-      today: 'HH:mm',
-      minutes: 'HH:mm',
-      seconds: 'HH:mm'
-    }
-    template = template[type]
+  console.log(type)
+  switch (localLang) {
+    case 'zhcn': Lang = Languages.zhcn; break
+    default: Lang = Languages.en
   }
 
-  if (format === 'default') {
+  if (format === 'detail' || format === 'short' || format === 'ago') {
+    let _type
+    if (type === 'seconds' || type === 'minutes') {
+      _type = 'today'
+    } else {
+      _type = type
+    }
+    var local = new Lang(month, week)
+    template = local.getFormat(format, _type)
     format = template
   }
   format = format.replace('yyyy', year)

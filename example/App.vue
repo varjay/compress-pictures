@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    测试结果：{{test}}
+    获取时间：2018-07-17 14:26<br>
+    详细模式：{{test('detail', '2018-07-17 14:26')}}<br>
+    简短模式：{{test('short', '2018-07-17 14:26')}}
   </div>
 </template>
 
@@ -12,9 +14,9 @@ export default {
     return {
     }
   },
-  computed: {
-    test () {
-      return TimeFormat('default', '1531649352000')
+  methods: {
+    test (type, timestamp) {
+      return TimeFormat(type, timestamp)
     }
   }
 }
