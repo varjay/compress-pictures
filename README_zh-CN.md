@@ -20,31 +20,26 @@ year：年
 month：月
 day：日
 
-time-format 最常见的应用场景是列表滚动，我们来看一下它的 html 结构
-```html
-<div class="wrapper">
-  <ul class="content">
-    <li>...</li>
-    <li>...</li>
-    ...
-  </ul>
-  <!-- 这里可以放一些其它的 DOM，但不会影响滚动 -->
-</div>
-```
-上面的代码中 time-format 是作用在外层 wrapper 容器上的，滚动的部分是 content 元素。这里要注意的是，time-format 只处理容器（wrapper）的第一个子元素（content）的滚动，其它的元素都会被忽略。
-
 最简单的初始化代码如下：
 
 ``` js
-import BScroll from 'time-format'
-let wrapper = document.querySelector('.wrapper')
-let scroll = new BScroll(wrapper)
+timeformat('default', '2018-02-11 12:08:12')
 ```
-time-format 提供了一个类，实例化的第一个参数是一个原生的 DOM 对象。当然，如果传递的是一个字符串，time-format 内部会尝试调用 querySelector 去获取这个 DOM 对象，所以初始化代码也可以是这样：
+time-format 提供了一个默认的返回方式，返回方式类似于微信的时间返回，具体如下：
 
 ``` js
-import BScroll from 'time-format'
-let scroll = new BScroll('.wrapper')
+// 假设当前时间为 2018-02-11 12:08:12 
+// 今天内的时间
+timeformat('default', '2018-02-11 00:08:12') // 00:08
+
+// 昨天内的时间
+timeformat('default', '2018-02-10 00:08:12') // 昨天 00:08
+
+// 7天内的时间
+timeformat('default', '2018-02-9 12:08:12') // 星期二 12:08
+
+// 超出7天
+timeformat('default', '2018-02-1 12:08:12') // 2018-02-1
 ```
 
 ## Changelog
