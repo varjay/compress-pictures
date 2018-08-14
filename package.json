@@ -1,6 +1,7 @@
 {
     "name": "mixed-sort",
-    "shortname": "MSort",
+    "shortname": "mixedsort",
+    "root": "MSort",
     "version": "0.0.1",
     "description": "",
     "main": "index.js",

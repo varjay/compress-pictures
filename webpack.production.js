@@ -13,15 +13,16 @@ module.exports = {
   output: {
     filename: '[name].js',
     libraryExport: 'default',
-    library: PKG.shortname,
+    library: PKG.root,
     libraryTarget: 'umd',
   },
   module: {
-    rules: [{
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-      },
+    rules: [
+      // {
+      //   test: /\.js$/,
+      //   loader: 'babel-loader',
+      //   exclude: /node_modules/,
+      // },
       {
         test: /\.less$/,
         use: [

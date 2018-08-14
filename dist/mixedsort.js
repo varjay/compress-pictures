@@ -101,247 +101,222 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _sortzh__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _sortzh = _interopRequireDefault(__webpack_require__(1));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function switchkey(obj, sortName) {
-  var r;
-
+function switchkey (obj, sortName) {
+  let r
   if (/^[a-zA-z]/.test(obj[sortName] ? obj[sortName] : '没有')) {
-    r = obj.en2zh;
+    r = obj.en2zh
   } else {
-    r = obj[sortName];
+    r = obj[sortName]
   }
-
   if (!r) {
-    return obj.zh;
+    return obj.zh
   }
-
-  return r;
+  return r
 }
 
-function main(arr, sortName) {
-  var isTag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-  arr = arr.concat(_sortzh.default); // 暂时无法对i u v 排序
-
-  var LETTERS = 'abcdefghjklmnopqrstwxyz'.split('');
-  var ZH = '安贝苍邓妸范葛胡杰科黎迈倪噢潘全呥萨特王希杨扎'.split('');
-  var iArr = [{
-    zh: '存在',
-    le: 'i'
-  }];
-  var uArr = [{
-    zh: '存在',
-    le: 'u'
-  }];
-  var vArr = [{
-    zh: '存在',
-    le: 'v'
-  }];
-
+function main (arr, sortName, isTag = 1) {
+  arr = arr.concat(_sortzh__WEBPACK_IMPORTED_MODULE_0__["default"])
+  // 暂时无法对i u v 排序
+  const LETTERS = 'abcdefghjklmnopqrstwxyz'.split('')
+  const ZH = '安贝苍邓妸范葛胡杰科黎迈倪噢潘全呥萨特王希杨扎'.split('')
+  let iArr = [{zh: '存在', le: 'i'}]
+  let uArr = [{zh: '存在', le: 'u'}]
+  let vArr = [{zh: '存在', le: 'v'}]
   for (var i = arr.length - 1; i >= 0; i--) {
     if (arr[i][sortName] && /^[a-zA-Z]/.test(arr[i][sortName])) {
-      var a = LETTERS.indexOf(arr[i][sortName][0].toLowerCase());
-
+      let a = LETTERS.indexOf(arr[i][sortName][0].toLowerCase())
       if (a > -1) {
-        arr[i]['en2zh'] = ZH[a];
-        arr[i]['le'] = arr[i][sortName][0];
+        arr[i]['en2zh'] = ZH[a]
+        arr[i]['le'] = arr[i][sortName][0]
       } else {
-        var letter = arr[i][sortName][0];
-        var isIUV = 0;
-
+        let letter = arr[i][sortName][0]
+        let isIUV = 0
         switch (letter) {
-          case 'i':
-            iArr.push(arr[i]);
-            isIUV = 1;
-            break;
-
-          case 'u':
-            uArr.push(arr[i]);
-            isIUV = 1;
-            break;
-
-          case 'v':
-            vArr.push(arr[i]);
-            isIUV = 1;
-            break;
+          case 'i': iArr.push(arr[i]); isIUV = 1; break
+          case 'u': uArr.push(arr[i]); isIUV = 1; break
+          case 'v': vArr.push(arr[i]); isIUV = 1; break
         }
-
         if (isIUV) {
-          arr.splice(i, 1);
+          arr.splice(i, 1)
         }
       }
     }
   }
 
-  arr.sort(function compareFunction(param1, param2) {
-    var one = switchkey(param1, sortName);
-    var two = switchkey(param2, sortName);
-    var r = one.localeCompare(two, 'zh-CN');
-    return r;
-  }); // 处理iuv
-
-  var numI = _sortzh.default[8];
-  var positionI = arr.indexOf(numI);
-
-  for (var _i = iArr.length - 1; _i >= 0; _i--) {
-    arr.splice(positionI, 0, iArr[_i]);
-  }
-
-  var UV = uArr.concat(vArr);
-  var numV = _sortzh.default[19];
-  var positionV = arr.indexOf(numV);
-
-  for (var _i2 = UV.length - 1; _i2 >= 0; _i2--) {
-    arr.splice(positionV, 0, UV[_i2]);
-  } // 分离无法识别的项目
-
-
-  var noSort = [];
-  var delPosition = -1;
-
-  for (var _i3 = 0; _i3 < arr.length; _i3++) {
-    if (arr[_i3].le === 'a') {
-      break;
+  arr.sort(
+    function compareFunction (param1, param2) {
+      let one = switchkey(param1, sortName)
+      let two = switchkey(param2, sortName)
+      let r = one.localeCompare(two, 'zh-CN')
+      return r
     }
+  )
 
-    noSort.push(arr[_i3]);
-    delPosition = _i3;
+  // 处理iuv
+  let numI = _sortzh__WEBPACK_IMPORTED_MODULE_0__["default"][8]
+  let positionI = arr.indexOf(numI)
+  for (let i = iArr.length - 1; i >= 0; i--) {
+    arr.splice(positionI, 0, iArr[i])
+  }
+  let UV = uArr.concat(vArr)
+  let numV = _sortzh__WEBPACK_IMPORTED_MODULE_0__["default"][19]
+  let positionV = arr.indexOf(numV)
+  for (let i = UV.length - 1; i >= 0; i--) {
+    arr.splice(positionV, 0, UV[i])
   }
 
-  arr.splice(0, delPosition + 1);
-
-  for (var _i4 = arr.length - 1; _i4 >= 0; _i4--) {
-    if (/^[\u4e00-\u9fa5a-zA-Z]/.test(arr[_i4][sortName])) {
-      break;
+  // 分离无法识别的项目
+  let noSort = []
+  let delPosition = -1
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].le === 'a') {
+      break
     }
-
-    noSort.push(arr[_i4]);
-    arr.splice(_i4, 1);
+    noSort.push(arr[i])
+    delPosition = i
   }
-
+  arr.splice(0, delPosition + 1)
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (/^[\u4e00-\u9fa5a-zA-Z]/.test(arr[i][sortName])) {
+      break
+    }
+    noSort.push(arr[i])
+    arr.splice(i, 1)
+  }
   if (noSort.length > 0) {
-    arr = arr.concat({
-      zh: '#',
-      le: '#'
-    }, noSort);
+    arr = arr.concat({zh: '#', le: '#'}, noSort)
   }
 
   if (isTag) {
     // 删除空的项目
-    for (var _i5 = arr.length - 1; _i5 >= 0; _i5--) {
-      if (arr[_i5].zh && arr[_i5 + 1] && arr[_i5 + 1].zh) {
-        arr.splice(_i5, 1);
+    for (let i = arr.length - 1; i >= 0; i--) {
+      if (arr[i].zh && arr[i + 1] && arr[i + 1].zh) {
+        arr.splice(i, 1)
       }
     }
   } else {
-    for (var _i6 = arr.length - 1; _i6 >= 0; _i6--) {
-      if (arr[_i6].zh) {
-        arr.splice(_i6, 1);
+    for (let i = arr.length - 1; i >= 0; i--) {
+      if (arr[i].zh) {
+        arr.splice(i, 1)
       }
     }
   }
-
-  return arr;
+  return arr
 }
 
-main.Version = '0.0.1';
-var _default = main;
-exports.default = _default;
+main.Version = '0.0.1'
+
+/* harmony default export */ __webpack_exports__["default"] = (main);
+
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ([
+  {
+    zh: '阿',
+    le: 'a'
+  },
+  {
+    zh: '八',
+    le: 'b'
+  },
+  {
+    zh: '嚓',
+    le: 'c'
+  },
+  {
+    zh: '哒',
+    le: 'd'
+  },
+  {
+    zh: '妸',
+    le: 'e'
+  },
+  {
+    zh: '发',
+    le: 'f'
+  },
+  {
+    zh: '旮',
+    le: 'g'
+  },
+  {
+    zh: '哈',
+    le: 'h'
+  },
+  {
+    zh: '讥',
+    le: 'j'
+  },
+  {
+    zh: '咔',
+    le: 'k'
+  },
+  {
+    zh: '垃',
+    le: 'l'
+  },
+  {
+    zh: '麻',
+    le: 'm'
+  },
+  {
+    zh: '拏',
+    le: 'n'
+  },
+  {
+    zh: '噢',
+    le: 'o'
+  },
+  {
+    zh: '妑',
+    le: 'p'
+  },
+  {
+    zh: '七',
+    le: 'q'
+  },
+  {
+    zh: '呥',
+    le: 'r'
+  },
+  {
+    zh: '扨',
+    le: 's'
+  },
+  {
+    zh: '它',
+    le: 't'
+  },
+  {
+    zh: '穵',
+    le: 'w'
+  },
+  {
+    zh: '夕',
+    le: 'x'
+  },
+  {
+    zh: '丫',
+    le: 'y'
+  },
+  {
+    zh: '帀',
+    le: 'z'
+  }
+]);
 
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _default = [{
-  zh: '阿',
-  le: 'a'
-}, {
-  zh: '八',
-  le: 'b'
-}, {
-  zh: '嚓',
-  le: 'c'
-}, {
-  zh: '哒',
-  le: 'd'
-}, {
-  zh: '妸',
-  le: 'e'
-}, {
-  zh: '发',
-  le: 'f'
-}, {
-  zh: '旮',
-  le: 'g'
-}, {
-  zh: '哈',
-  le: 'h'
-}, {
-  zh: '讥',
-  le: 'j'
-}, {
-  zh: '咔',
-  le: 'k'
-}, {
-  zh: '垃',
-  le: 'l'
-}, {
-  zh: '麻',
-  le: 'm'
-}, {
-  zh: '拏',
-  le: 'n'
-}, {
-  zh: '噢',
-  le: 'o'
-}, {
-  zh: '妑',
-  le: 'p'
-}, {
-  zh: '七',
-  le: 'q'
-}, {
-  zh: '呥',
-  le: 'r'
-}, {
-  zh: '扨',
-  le: 's'
-}, {
-  zh: '它',
-  le: 't'
-}, {
-  zh: '穵',
-  le: 'w'
-}, {
-  zh: '夕',
-  le: 'x'
-}, {
-  zh: '丫',
-  le: 'y'
-}, {
-  zh: '帀',
-  le: 'z'
-}];
-exports.default = _default;
 
 /***/ })
 /******/ ])["default"];
