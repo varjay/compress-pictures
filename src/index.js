@@ -1,108 +1,101 @@
-import sortzh from './sortzh'
+import autoQuality from './autoQuality'
 
-function switchkey (obj, sortName) {
-  let r
-  if (/^[a-zA-z]/.test(obj[sortName] ? obj[sortName] : '没有')) {
-    r = obj.en2zh
+function compressImg(inputFile, afterWidth = 0) {
+  inputFile = inputFile.files[0]
+  let imgType = inputFile.type
+  let hidCtx
+  let hidCanvas = document.createElement('canvas')
+
+  // 生成隐藏画布
+  if (hidCanvas.getContext) {
+    hidCtx = hidCanvas.getContext('2d')
   } else {
-    r = obj[sortName]
+    return 0
   }
-  if (!r) {
-    return obj.zh
-  }
-  return r
+  // 通过 this.files 取到 FileList ，这里只有一个
+  let p = new Image()
+  let reader = new FileReader()
+  return new Promise(function(resolve, reject) {
+    reader.onload = function(evt) {
+      p.src = evt.target.result
+      p.onload = function() {
+        let upImgWidth = p.width
+        let upImgHeight = p.height
+        // 压缩换算后的图片高度
+        // let afterHeight = afterWidth * upImgHeight / upImgWidth
+        if (upImgWidth < 10 || upImgWidth < 10) {
+          return false
+        }
+        // 设置压缩canvas区域高度及宽度
+        let target = autoQuality(p.width, p.height)
+        hidCanvas.setAttribute('width', target.width)
+        hidCanvas.setAttribute('height', target.height)
+
+        // canvas绘制压缩后图片
+        drawImageIOSFix(hidCtx, p, 0, 0, upImgWidth, upImgHeight, 0, 0, target.width, target.height)
+        // 获取压缩后生成的img对象
+        resolve(convertBase64UrlToBlob(convertCanvasToImage(hidCanvas, imgType).src, imgType))
+      }
+    }
+    reader.readAsDataURL(inputFile)
+  })
 }
 
-function main (arr, sortName, isTag = 1) {
-  arr = arr.concat(sortzh)
-  // 暂时无法对i u v 排序
-  const LETTERS = 'abcdefghjklmnopqrstwxyz'.split('')
-  const ZH = '安贝苍邓妸范葛胡杰科黎迈倪噢潘全呥萨特王希杨扎'.split('')
-  let iArr = [{zh: '存在', le: 'i'}]
-  let uArr = [{zh: '存在', le: 'u'}]
-  let vArr = [{zh: '存在', le: 'v'}]
-  for (var i = arr.length - 1; i >= 0; i--) {
-    if (arr[i][sortName] && /^[a-zA-Z]/.test(arr[i][sortName])) {
-      let a = LETTERS.indexOf(arr[i][sortName][0].toLowerCase())
-      if (a > -1) {
-        arr[i]['en2zh'] = ZH[a]
-        arr[i]['le'] = arr[i][sortName][0]
-      } else {
-        let letter = arr[i][sortName][0]
-        let isIUV = 0
-        switch (letter) {
-          case 'i': iArr.push(arr[i]); isIUV = 1; break
-          case 'u': uArr.push(arr[i]); isIUV = 1; break
-          case 'v': vArr.push(arr[i]); isIUV = 1; break
-        }
-        if (isIUV) {
-          arr.splice(i, 1)
-        }
-      }
-    }
-  }
-
-  arr.sort(
-    function compareFunction (param1, param2) {
-      let one = switchkey(param1, sortName)
-      let two = switchkey(param2, sortName)
-      let r = one.localeCompare(two, 'zh-CN')
-      return r
-    }
-  )
-
-  // 处理iuv
-  let numI = sortzh[8]
-  let positionI = arr.indexOf(numI)
-  for (let i = iArr.length - 1; i >= 0; i--) {
-    arr.splice(positionI, 0, iArr[i])
-  }
-  let UV = uArr.concat(vArr)
-  let numV = sortzh[19]
-  let positionV = arr.indexOf(numV)
-  for (let i = UV.length - 1; i >= 0; i--) {
-    arr.splice(positionV, 0, UV[i])
-  }
-
-  // 分离无法识别的项目
-  let noSort = []
-  let delPosition = -1
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i].le === 'a') {
-      break
-    }
-    noSort.push(arr[i])
-    delPosition = i
-  }
-  arr.splice(0, delPosition + 1)
-  for (let i = arr.length - 1; i >= 0; i--) {
-    if (/^[\u4e00-\u9fa5a-zA-Z]/.test(arr[i][sortName])) {
-      break
-    }
-    noSort.push(arr[i])
-    arr.splice(i, 1)
-  }
-  if (noSort.length > 0) {
-    arr = arr.concat({zh: '#', le: '#'}, noSort)
-  }
-
-  if (isTag) {
-    // 删除空的项目
-    for (let i = arr.length - 1; i >= 0; i--) {
-      if (arr[i].zh && arr[i + 1] && arr[i + 1].zh) {
-        arr.splice(i, 1)
-      }
-    }
-  } else {
-    for (let i = arr.length - 1; i >= 0; i--) {
-      if (arr[i].zh) {
-        arr.splice(i, 1)
-      }
-    }
-  }
-  return arr
+// canvas转图像
+function convertCanvasToImage(canvas, imgType) {
+  let image = new Image()
+  image.src = canvas.toDataURL(imgType, 0.7)
+  return image
 }
 
-main.Version = '0.0.1'
+// 以下代码是修复canvas在ios中显示压缩的问题。
+function detectVerticalSquash(img) {
+  let ih = img.naturalHeight
+  let canvas = document.createElement('canvas')
+  canvas.width = 1
+  canvas.height = ih
+  let ctx = canvas.getContext('2d')
+  ctx.drawImage(img, 0, 0)
+  let data = ctx.getImageData(0, 0, 1, ih).data
+  // search image edge pixel position in case it is squashed vertically.
+  let sy = 0
+  let ey = ih
+  let py = ih
+  while (py > sy) {
+    let alpha = data[(py - 1) * 4 + 3]
+    if (alpha === 0) {
+      ey = py
+    } else {
+      sy = py
+    }
+    py = (ey + sy) >> 1
+  }
+  let ratio = (py / ih)
+  return (ratio === 0) ? 1 : ratio
+}
 
-export default main
+/**
+ * A replacement for context.drawImage
+ * (args are for source and destination).
+ */
+function drawImageIOSFix(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+  let vertSquashRatio = detectVerticalSquash(img)
+  ctx.drawImage(img, sx * vertSquashRatio, sy * vertSquashRatio,
+    sw * vertSquashRatio, sh * vertSquashRatio,
+    dx, dy, dw, dh)
+}
+
+function convertBase64UrlToBlob(urlData, imgType) {
+  let bytes = window.atob(urlData.split(',')[1]) // 去掉url的头，并转换为byte
+
+  // 处理异常,将ascii码小于0的转换为大于0
+  let ab = new ArrayBuffer(bytes.length)
+  let ia = new Uint8Array(ab)
+  console.log(ab)
+  for (let i = 0; i < bytes.length; i++) {
+    ia[i] = bytes.charCodeAt(i)
+  }
+  return new Blob([ab], {type: imgType})
+}
+
+export default compressImg

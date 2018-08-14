@@ -1,7 +1,7 @@
 {
-    "name": "mixed-sort",
-    "shortname": "mixedsort",
-    "root": "MSort",
+    "name": "compress-pictures",
+    "shortname": "compresspictures",
+    "root": "TinyPic",
     "version": "0.0.1",
     "description": "",
     "main": "index.js",
