@@ -34,7 +34,12 @@ function compressImg(inputFile, afterWidth = 0) {
         // canvas绘制压缩后图片
         drawImageIOSFix(hidCtx, p, 0, 0, upImgWidth, upImgHeight, 0, 0, target.width, target.height)
         // 获取压缩后生成的img对象
-        resolve(convertBase64UrlToBlob(convertCanvasToImage(hidCanvas, imgType).src, imgType))
+        let img = convertBase64UrlToBlob(convertCanvasToImage(hidCanvas, imgType).src, imgType)
+        resolve({
+          img: img,
+          url: URL.createObjectURL(img),
+          info: target,
+        })
       }
     }
     reader.readAsDataURL(inputFile)
@@ -91,7 +96,7 @@ function convertBase64UrlToBlob(urlData, imgType) {
   // 处理异常,将ascii码小于0的转换为大于0
   let ab = new ArrayBuffer(bytes.length)
   let ia = new Uint8Array(ab)
-  console.log(ab)
+  // console.log(ab)
   for (let i = 0; i < bytes.length; i++) {
     ia[i] = bytes.charCodeAt(i)
   }

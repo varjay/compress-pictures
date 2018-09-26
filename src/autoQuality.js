@@ -42,7 +42,8 @@ function autoQuality (width, height) {
       targetW = targetH * ratio
     }
   }
-
+  targetW = Math.round(targetW)
+  targetH = Math.round(targetH)
   return {width: targetW, height: targetH}
 }
 export default autoQuality

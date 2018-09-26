@@ -1,89 +1,48 @@
-## mixed-sort 是什么
+## compress-pictures 是什么
 
-mixed-sort 是一款基于前端JavaScript中英文排序的插件，开发时应用于通讯录排序，也可用于其他场景。
+compress-pictures 是一款基于前端JavaScript图片压缩插件，默认以80%质量压缩。
 
-mixed-sort 是基于原生 JS 实现的，不依赖任何框架。它编译后的代码大小是 3.6kb，压缩后是 2.1kb，gzip 后仅有 1.03kb，是一款非常轻量的 JS lib。
+compress-pictures 是基于原生 JS 实现的，不依赖任何框架。它编译压缩后是 2.55kb，gzip 后仅有 1.03kb，是一款非常轻量的 JS lib。
+
+## 压缩逻辑
+```js
+// 宽高均 <= 1280，图片尺寸大小保持不变
+// 宽高均 > 1280 && 宽高比 > 2，
+// ----宽大于高 取较小值(高)等于1280，较大值等比例压缩
+// ----高大于宽 取较小值(宽)等于1280，较大值等比例压缩 (宽高比在0.5到2之间 )
+// 宽或高 > 1280
+// ----宽图 图片尺寸大小保持不变
+// ----长图 图片尺寸大小保持不变
+// 宽大于高 取较大值(宽)等于1280，较小值等比例压缩
+// 高大于宽 取较大值(高)等于1280，较小值等比例压缩
+```
 
 ## 起步
 
 ##### 使用方法
 
 ``` js
-msort(array, key, options)
+// 安装
+npm i compress-pictures -S
 
-array: // 排序对象，例如：
-[
-  {
-    'user_name': '123'
-  },
-  {
-    'user_name': '王小明'
-  },
-  {
-    'user_name': '阿红'
-  },
-  {
-    'user_name': '周此伦'
-  }
-]
-
-key: // 排序的key名称，例如：“user_name”
-
-options: // 是否包含字母头，0为不包含，默认值1
+// 代码中的使用
+let img = await tinypic(this.$refs.img) // 传入input DOM对象
 ```
 
 ##### 默认返回值
-mixed-sort 提供了一个默认的返回方式，具体如下：
+compress-pictures 提供了一个默认的返回方式，具体如下：
 
 ``` js
-msort(array, 'user_name')
-// 将返回如下：
-[
-  {
-    le: 'a'
+{
+  url: 图片blob地址,
+  img: blob对象,
+  info: {
+    height: 高度,
+    width: 宽度,
   },
-  {
-    'user_name': '阿红'
-  },
-  {
-    le: 'w'
-  },
-  {
-    'user_name': '王小明'
-  },
-  {
-    le: 'z'
-  },
-  {
-    'user_name': '周此伦'
-  },
-  {
-    le: '#'
-  },
-  {
-    'user_name': '123'
-  }
-]
-
-
-msort(array, 'user_name', 0)
-// 将返回如下：
-[
-  {
-    'user_name': '阿红'
-  },
-  {
-    'user_name': '王小明'
-  },
-  {
-    'user_name': '周此伦'
-  },
-  {
-    'user_name': '123'
-  }
-]
+}
 ```
 
 ## Changelog
 
-每次改动的详情参考[发版日志](https://github.com/varjay/mixed-sort/releases).
+每次改动的详情参考[发版日志](https://github.com/varjay/compress-pictures/releases).
