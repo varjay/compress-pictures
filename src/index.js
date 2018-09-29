@@ -1,6 +1,6 @@
 import autoQuality from './autoQuality'
 
-function compressImg(inputFile, afterWidth = 0) {
+function compressImg(inputFile, cmd) {
   inputFile = inputFile.files[0]
   let imgType = inputFile.type
   let hidCtx
@@ -21,18 +21,20 @@ function compressImg(inputFile, afterWidth = 0) {
       p.onload = function() {
         let upImgWidth = p.width
         let upImgHeight = p.height
+        let sx = 0
+        let sy = 0
         // 压缩换算后的图片高度
-        // let afterHeight = afterWidth * upImgHeight / upImgWidth
         if (upImgWidth < 10 || upImgWidth < 10) {
           return false
         }
         // 设置压缩canvas区域高度及宽度
         let target = autoQuality(p.width, p.height)
+        let result = execCmd(cmd, target)
         hidCanvas.setAttribute('width', target.width)
         hidCanvas.setAttribute('height', target.height)
 
         // canvas绘制压缩后图片
-        drawImageIOSFix(hidCtx, p, 0, 0, upImgWidth, upImgHeight, 0, 0, target.width, target.height)
+        drawImageIOSFix(hidCtx, p, sx, sy, upImgWidth, upImgHeight, 0, 0, target.width, target.height)
         // 获取压缩后生成的img对象
         let img = convertBase64UrlToBlob(convertCanvasToImage(hidCanvas, imgType).src, imgType)
         resolve({
@@ -101,6 +103,28 @@ function convertBase64UrlToBlob(urlData, imgType) {
     ia[i] = bytes.charCodeAt(i)
   }
   return new Blob([ab], {type: imgType})
+}
+
+function execCmd(cmd, d) {
+  console.log(d)
+  if (cmd.includes('square')) {
+    // 输出图片为正方形
+    let newsize
+    let result = {}
+    if (d.width > d.height) {
+      newsize = d.height
+      result['sx'] = (d.width - d.height) / 2
+      result['xy'] = 0
+      result['new'] = d.height
+    } else if(d.height > d.width){
+      result['sx'] = 0
+      result['sy'] = (d.height - d.width) / 2
+      result['new'] = d.width
+    } else {
+      return false
+    }
+  }
+  return d
 }
 
 export default compressImg
