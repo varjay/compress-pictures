@@ -32,8 +32,15 @@ function compressImg(inputFile, cmd) {
         let result = execCmd(cmd, target)
         hidCanvas.setAttribute('width', target.width)
         hidCanvas.setAttribute('height', target.height)
+        if (result) {
+          sx = result.sx
+          sy = result.sy
+          hidCanvas.setAttribute('width', result.width)
+          hidCanvas.setAttribute('height', result.height)
+        }
 
         // canvas绘制压缩后图片
+        console.log(sx, sy, upImgWidth, upImgHeight)
         drawImageIOSFix(hidCtx, p, sx, sy, upImgWidth, upImgHeight, 0, 0, target.width, target.height)
         // 获取压缩后生成的img对象
         let img = convertBase64UrlToBlob(convertCanvasToImage(hidCanvas, imgType).src, imgType)
@@ -106,25 +113,27 @@ function convertBase64UrlToBlob(urlData, imgType) {
 }
 
 function execCmd(cmd, d) {
-  console.log(d)
+  let result = null
   if (cmd.includes('square')) {
     // 输出图片为正方形
     let newsize
-    let result = {}
+    result = {}
     if (d.width > d.height) {
       newsize = d.height
       result['sx'] = (d.width - d.height) / 2
-      result['xy'] = 0
-      result['new'] = d.height
+      result['sy'] = 0
+      result['width'] = d.height
+      result['height'] = d.height
     } else if(d.height > d.width){
       result['sx'] = 0
       result['sy'] = (d.height - d.width) / 2
-      result['new'] = d.width
+      result['width'] = d.width
+      result['height'] = d.width
     } else {
       return false
     }
   }
-  return d
+  return result
 }
 
 export default compressImg
