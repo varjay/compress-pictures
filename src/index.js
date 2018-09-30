@@ -29,14 +29,17 @@ function compressImg(inputFile, cmd) {
         }
         // 设置压缩canvas区域高度及宽度
         let target = autoQuality(p.width, p.height)
-        let result = execCmd(cmd, target)
         hidCanvas.setAttribute('width', target.width)
         hidCanvas.setAttribute('height', target.height)
-        if (result) {
-          sx = result.sx
-          sy = result.sy
-          hidCanvas.setAttribute('width', result.width)
-          hidCanvas.setAttribute('height', result.height)
+        
+        if (cmd) {
+          let result = execCmd(cmd, target)
+          if (result) {
+            sx = result.sx
+            sy = result.sy
+            hidCanvas.setAttribute('width', result.width)
+            hidCanvas.setAttribute('height', result.height)
+          }
         }
 
         // canvas绘制压缩后图片

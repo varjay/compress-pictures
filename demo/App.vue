@@ -53,7 +53,7 @@ export default {
   methods: {
     async change() {
       window.img = this.$refs.img
-      this.after = await tinypic(this.$refs.img, 'square')
+      this.after = await tinypic(this.$refs.img)
 
       let MyTest = document.getElementById("upload_img").files[0]
       let reader = new FileReader()
