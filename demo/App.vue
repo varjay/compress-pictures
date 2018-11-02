@@ -55,6 +55,8 @@ export default {
       window.img = this.$refs.img
       this.after = await tinypic(this.$refs.img)
 
+      console.log(this.after)
+
       let MyTest = document.getElementById("upload_img").files[0]
       let reader = new FileReader()
       reader.readAsDataURL(MyTest)

@@ -83,6 +83,7 @@ module.exports = {
     contentBase: path.join(__dirname, "demo/public"),
     compress: true,
     hot: true,
+    host: "0.0.0.0",
     https: false,
     clientLogLevel: 'error'
   },
