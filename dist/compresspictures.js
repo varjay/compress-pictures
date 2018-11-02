@@ -1,6 +1,6 @@
 /*!
  * compress-pictures
- * @version 1.0.0
+ * @version 1.0.1
  * @see https://github.com/varjay/
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -105,13 +105,48 @@ return /******/ (function(modules) { // webpackBootstrap
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-async function resetOrientation(srcBase64, srcOrientation, imgType) {
+function execCmd(cmd, d) {
+  let result = null
+  if (cmd.includes('square')) {
+    // 输出图片为正方形
+    let newsize
+    result = {}
+    if (d.width > d.height) {
+      newsize = d.height
+      result['sx'] = -(d.width - d.height) / 2
+      result['sy'] = 0
+      result['width'] = d.height
+      result['height'] = d.height
+    } else if(d.height > d.width){
+      result['sx'] = 0
+      result['sy'] = -(d.height - d.width) / 2
+      result['width'] = d.width
+      result['height'] = d.width
+    } else {
+      return false
+    }
+  }
+  return result
+}
+
+async function resetOrientation(srcBase64, srcOrientation, imgType, cmd) {
   return new Promise(resolve => {
     let img = new Image()
     img.onload = function() {
       let newsize = autoQuality(img.width, img.height)
       let width = newsize.width
       let height = newsize.height
+      let sx
+      let sy
+      if (cmd) {
+        let result = execCmd(cmd, newsize)
+        if (result) {
+          sx = result.sx
+          sy = result.sy
+          width = result.width
+          height = result.height
+        }
+      }
       let canvas = document.createElement('canvas')
       let ctx = canvas.getContext("2d")
 
@@ -149,13 +184,8 @@ async function resetOrientation(srcBase64, srcOrientation, imgType) {
         default:
           ctx.transform(1, 0, 0, 1, 0, 0)
       }
+      ctx.drawImage(img, sx, sy, newsize.width, newsize.height)
 
-      // draw image
-      if ([5, 6, 7, 8].indexOf(srcOrientation) > -1) {
-        ctx.drawImage(img, 0, 0, canvas.height, canvas.width)
-      } else {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      }
       resolve({img: canvas.toDataURL(imgType, 0.7), width: canvas.width, height: canvas.height})
     }
     img.src = srcBase64
@@ -260,7 +290,7 @@ function dataURLtoBlob(dataurl) {
   }
   return new Blob([u8arr], { type: mime });
 }
-async function start(inputFile) {
+async function start(inputFile, cmd) {
   let img = inputFile.files[0]
   let imgType = img.type
   console.log(imgType)
@@ -272,7 +302,7 @@ async function start(inputFile) {
   let base64 = `data:${imgType};base64,` + arrayBufferToBase64(r.arraybuffer)
 
   // 方向校正并压缩
-  let afterimg = await resetOrientation(base64, r.orientation, imgType)
+  let afterimg = await resetOrientation(base64, r.orientation, imgType, cmd)
 
   // 转换为blob
   let blob = dataURLtoBlob(afterimg.img)
