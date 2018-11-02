@@ -53,7 +53,7 @@ export default {
   methods: {
     async change() {
       window.img = this.$refs.img
-      this.after = await tinypic(this.$refs.img)
+      this.after = await tinypic(this.$refs.img, 'square')
 
       console.log(this.after)
 
