@@ -29,8 +29,8 @@ async function resetOrientation(srcBase64, srcOrientation, imgType, cmd) {
       let newsize = autoQuality(img.width, img.height)
       let width = newsize.width
       let height = newsize.height
-      let sx
-      let sy
+      let sx = 0
+      let sy = 0
       if (cmd) {
         let result = execCmd(cmd, newsize)
         if (result) {
