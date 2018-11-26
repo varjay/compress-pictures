@@ -90,37 +90,38 @@ async function getOrientation(file) {
     let reader = new FileReader()
     reader.onload = function(e) {
       let view = new DataView(this.result)
-      if (view.getUint16(0, false) != 0xFFD8) resolve({ orientation: -2, arraybuffer: this.result })
+      if (view.getUint16(0, false) != 0xFFD8) resolve({ orientation: -2 })
       let length = view.byteLength,
         offset = 2
       while (offset < length) {
         let marker = view.getUint16(offset, false)
         offset += 2
         if (marker == 0xFFE1) {
-          if (view.getUint32(offset += 2, false) != 0x45786966) resolve({ orientation: -1, arraybuffer: this.result })
+          if (view.getUint32(offset += 2, false) != 0x45786966) resolve({ orientation: -1 })
           let little = view.getUint16(offset += 6, false) == 0x4949
           offset += view.getUint32(offset + 4, little)
           let tags = view.getUint16(offset, little)
           offset += 2
           for (let i = 0; i < tags; i++)
             if (view.getUint16(offset + (i * 12), little) == 0x0112)
-              resolve({ orientation: view.getUint16(offset + (i * 12) + 8, little), arraybuffer: this.result })
+              resolve({ orientation: view.getUint16(offset + (i * 12) + 8, little) })
         } else if ((marker & 0xFF00) != 0xFF00) break
         else offset += view.getUint16(offset, false)
       }
-      resolve({ orientation: -1, arraybuffer: this.result })
+      resolve({ orientation: -1 })
     }
     reader.readAsArrayBuffer(file)
   })
 }
 
-function arrayBufferToBase64(buffer) {
-  let binary = ''
-  let bytes = new Uint8Array(buffer)
-  for (let len = bytes.byteLength, i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return window.btoa(binary)
+function fileToBase64(img) {
+  return new Promise(resolve => {
+    let ready = new FileReader()
+    ready.readAsDataURL(img)
+    ready.onload = function(){
+      resolve(this.result)
+    }
+  })
 }
 
 function autoQuality(width, height) {
@@ -186,20 +187,28 @@ function dataURLtoBlob(dataurl) {
 async function start(inputFile, cmd) {
   let img = inputFile.files[0]
   let imgType = img.type
-  console.log(imgType)
+  // console.log(imgType)
 
   // 照片方向
+  // console.time()
   let r = await getOrientation(img)
+  // console.timeEnd()
 
   // 转换为base64
-  let base64 = `data:${imgType};base64,` + arrayBufferToBase64(r.arraybuffer)
+  // console.time()
+  let base64 = await fileToBase64(img)
+  // console.timeEnd()
 
   // 方向校正并压缩
+  // console.time()
   let afterimg = await resetOrientation(base64, r.orientation, imgType, cmd)
+  // console.timeEnd()
 
   // 转换为blob
+  // console.time()
   let blob = dataURLtoBlob(afterimg.img)
   let url = URL.createObjectURL(blob)
+  // console.timeEnd()
 
   return {img: blob, url, info: {width: afterimg.width, height: afterimg.height}}
 }
