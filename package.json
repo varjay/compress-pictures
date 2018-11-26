@@ -2,7 +2,7 @@
   "name": "compress-pictures",
   "shortname": "compresspictures",
   "root": "TinyPic",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "compress-pictures 是一款基于前端JavaScript图片压缩插件，默认以80%质量压缩。",
   "main": "/src/index.js",
   "module": "src/index.js",
