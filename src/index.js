@@ -188,29 +188,56 @@ async function start(inputFile, cmd) {
   let img = inputFile.files[0]
   let imgType = img.type
   // console.log(imgType)
+  if (imgType.indexOf('gif') === -1) {
+    // 照片方向
+    // console.time()
+    let r = await getOrientation(img)
+    // console.timeEnd()
 
-  // 照片方向
-  // console.time()
-  let r = await getOrientation(img)
-  // console.timeEnd()
+    // 转换为base64
+    // console.time()
+    let base64 = await fileToBase64(img)
+    // console.timeEnd()
 
-  // 转换为base64
-  // console.time()
-  let base64 = await fileToBase64(img)
-  // console.timeEnd()
+    // 方向校正并压缩
+    // console.time()
+    let afterimg = await resetOrientation(base64, r.orientation, imgType, cmd)
+    // console.timeEnd()
 
-  // 方向校正并压缩
-  // console.time()
-  let afterimg = await resetOrientation(base64, r.orientation, imgType, cmd)
-  // console.timeEnd()
+    // 转换为blob
+    // console.time()
+    let blob = dataURLtoBlob(afterimg.img)
+    let url = URL.createObjectURL(blob)
+    // console.timeEnd()
 
-  // 转换为blob
-  // console.time()
-  let blob = dataURLtoBlob(afterimg.img)
-  let url = URL.createObjectURL(blob)
-  // console.timeEnd()
-
-  return {img: blob, url, info: {width: afterimg.width, height: afterimg.height}}
+    return {img: blob, url, info: {width: afterimg.width, height: afterimg.height}}
+  } else {
+    let getSize = async function(f) {
+      return new Promise(function(resolve, reject) {
+        let reader = new FileReader()
+        reader.onload = function(e) {
+          let data = e.target.result
+          let image = new Image()
+          image.onload=function() {
+            let width = image.width
+            let height = image.height
+            resolve({
+              width,
+              height,
+              size: f.size,
+            })
+          }
+          image.src = data
+        }
+        reader.readAsDataURL(f)
+      })
+    }
+    let info = await getSize(img)
+    let base64 = await fileToBase64(img)
+    let blob = dataURLtoBlob(base64)
+    let url = URL.createObjectURL(blob)
+    return {img, url, info}
+  }
 }
 
 export default start
